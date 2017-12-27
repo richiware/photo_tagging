@@ -1,0 +1,1 @@
+exiftool -all= -tagsfromfile @ -all:all -m  -unsafe -icc_profile -ext jpg .
