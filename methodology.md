@@ -32,26 +32,27 @@ El renombrado de las fotos es automático con el script `add\_tag.py` descrito e
 El etiquetado consta de una etiqueta principal relativa al evento, otras etiquetas relacionadas y el etiquetado de las
 personas presentes en la foto.
 
-### Etiqueta principal
+### Etiquetas
 
-La etiqueta principal contiene el evento (suele coincidir con el nombre usado en la carpeta).
+Para etiquetar se usa el script `add\_tag.py`.
+
+La etiqueta principal (Subject) contiene el evento (suele coincidir con el nombre usado en la carpeta).
 
 ```
 > Pirineos
 > Piscina Buitrago
 ```
 
-El script `add\_main_tag.py` renombra todas las fotos de la carpeta y les inserta la etiqueta principal.
+Con la opción `-s` se especifica el evento principal.
+Además con la opción `-r` se renombran las fotos usando la etiqueta principal.
 
 ```bash
 # Usa "Pirineos" como nombre del fichero y etiqueta principal.
-$ ./add_main_tag.py Pirineos
+$ ./add_tag.py -r -s Pirineos
 # Usa "Pirineos" como nombre del fichero y "Montaña" como etiqueta principal.
-$ ./add_main_tag.py Pirineos Montaña
+$ ./add_main_tag.py -R Pirineos -s Montaña
 ```
-### Etiquetas secundarias
-
-Las etiquetas secundarias son añadidas a través del script `add_tag.py`.
+El resto de parámetros son etiquetas secundarias que se añadirán en las fotografías.
 
 ```bash
 # Etiquetamos la foto `prueba.jpg` con 3 etiquetas
