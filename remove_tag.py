@@ -44,12 +44,13 @@ def processImage(fname):
     call(['exiftool', '-codedcharacterset=utf8', '-exif:XPSubject-=' + tagname, '-iptc:Keywords-=' + tagname,
         '-xmp:Subject-=' + tagname, '-ext', 'jpg', fname])
 
-    # Add XPKeywords to list.
+    # Remove XPKeywords to list.
     if(keywords):
         keywords = keywords.replace(tagname + ";", "")
+        keywords = keywords.replace(";" + tagname, "")
         keywords = keywords.replace(tagname, "")
 
-    # Add XPKeywords
+    # Add new XPKeywords
     call(['exiftool', '-codedcharacterset=utf8', '-exif:XPKeywords=' + keywords, '-ext', 'jpg', fname])
 
     # Compare early size with new

@@ -76,7 +76,7 @@ def processImages():
         call(['exiftool', '-FileName<' + file_name + ' ${DateTimeOriginal}.jpg', '-d', '%Y%m%d-%H%M%S%%-c', '-ext', 'jpg', '.'])
 
     for fname in os.listdir('.'):
-        if fnmatch.fnmatch(fname, '*.jpg'):
+        if fnmatch.fnmatch(fname, '*.[jJ][pP][gG]'):
             filesize_orig = os.path.getsize(fname)
 
             # Get previous XPKeywords
