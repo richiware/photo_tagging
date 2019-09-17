@@ -39,29 +39,50 @@ def processImage(fname):
     # Safe size of one file.
     filesize_orig = os.path.getsize(fname)
 
-    # Prepare XPKeywords
-    process = Popen(['exiftool', '-exif:XPKeywords', '-ext', 'jpg', fname], stdout=PIPE)
+    # Get previous XPKeywords, Keywords and PersonInImage.
+    process = Popen(['exiftool', '-ext', 'jpg', fname], stdout=PIPE)
     output, err = process.communicate()
-    keywords = ""
+    xpkeywords = []
+    keywords = []
+    persons = []
     for line in output.splitlines():
         strline = line.decode()
         if fnmatch.fnmatch(strline, 'XP Keywords*'):
             index = strline.index(':')
-            keywords = strline[index+2:]
-            break
+            xpkeywords = strline[index+2:].split(';')
+        elif fnmatch.fnmatch(strline, 'Keywords*'):
+            index = strline.index(':')
+            keywords = strline[index+2:].split(', ')
+        elif fnmatch.fnmatch(strline, 'Person In Image*'):
+            index = strline.index(':')
+            persons = strline[index+2:].split(', ')
 
-    # For each name insert it in the metadata
+    # Join keywords and people removing desired ones and make uniques using a Set.
+    set_keywords = (set(xpkeywords) | set(keywords))
+    set_keywords.discard('')
+    set_persons = set(persons)
+    set_persons.discard('')
     for name in names:
-        # Call exiftool
-        call(['exiftool', '-codedcharacterset=utf8', '-iptc:Keywords-=' + name, '-xmp:PersonInImage-=' + name, '-ext', 'jpg', fname])
+        set_keywords.discard(name)
+        set_persons.discard(name)
 
-        # Add XPKeywords to list.
-        if(keywords):
-            keywords = keywords.replace(name + ";", "")
-            keywords = keywords.replace(name, "")
+    # Remove previos IPTC Keyworks. Otherwise new keywords will be appended and there will be duplicate keywords.
+    arguments = ['exiftool', '-codedcharacterset=utf8', '-iptc:Keywords=', '-ext', 'jpg', fname]
+    call(arguments)
 
-    # Add XPKeywords
-    call(['exiftool', '-codedcharacterset=utf8', '-exif:XPKeywords=' + keywords, '-ext', 'jpg', fname])
+    # Store new information.
+    arguments = ['exiftool', '-codedcharacterset=utf8']
+    ch_plus = ''
+    for kw in set_keywords:
+        arguments.append('-iptc:Keywords' + ch_plus + '=' + kw)
+        ch_plus = '+'
+    arguments.append('-exif:XPKeywords=' + ';'.join(set_keywords))
+    arguments.append('-xmp:PersonInImage=' + ', '.join(set_persons))
+    arguments.append('-ext')
+    arguments.append('jpg')
+    arguments.append(fname)
+
+    call(arguments)
 
     # Compare early size with new
     if filesize_orig >= os.path.getsize(fname):
